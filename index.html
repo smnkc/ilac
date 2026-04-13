@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MediTrack</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- PWA / iOS Support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MediTrack">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <meta name="theme-color" content="#10b981">
+    
+    <!-- Preload fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M2 12h20"/>
+                </svg>
+                <h1>MediTrack</h1>
+            </div>
+            <div class="header-actions">
+                <button id="addMedBtn" class="btn-icon" aria-label="İlaç Ekle" style="display:none;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="app-content" id="main-content">
+            
+            <!-- VIEW: DASHBOARD (BUGÜN) -->
+            <section id="view-dashboard" class="view active">
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <div>
+                            <h2>Merhaba!</h2>
+                            <p>Bugünkü planın</p>
+                        </div>
+                        <div class="progress-count" id="progress-text">0/0</div>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div id="dashboard-items-container">
+                    <!-- Dashboard items will be injected here via JS -->
+                </div>
+            </section>
+
+            <!-- VIEW: İLAÇLAR -->
+            <section id="view-medications" class="view">
+                <div id="medications-container">
+                    <!-- Medications will be injected here via JS -->
+                </div>
+            </section>
+
+            <!-- VIEW: GEÇMİŞ -->
+            <section id="view-history" class="view">
+                <div id="history-container">
+                    <!-- History will be injected here via JS -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="app-nav">
+            <button class="nav-item active" data-target="dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Bugün</span>
+            </button>
+            <button class="nav-item" data-target="medications">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5l10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path><path d="m8.5 8.5 7 7"></path></svg>
+                <span>İlaçlar</span>
+            </button>
+            <button class="nav-item" data-target="history">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path><path d="M12 7v5l4 2"></path></svg>
+                <span>Geçmiş</span>
+            </button>
+        </nav>
+
+        <!-- Modals -->
+        <div class="modal-overlay" id="addMedModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>İlaç Düzenle/Ekle</h3>
+                    <button class="close-modal"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                </div>
+                <div class="modal-body">
+                    <form id="medForm">
+                        <input type="hidden" id="medId" value="">
+                        <div class="form-group">
+                            <label class="form-label">İlaç Adı</label>
+                            <input type="text" class="form-input" id="medName" required placeholder="Örn: Aspirin">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Dozaj / Miktar</label>
+                            <input type="text" class="form-input" id="medDosage" placeholder="Örn: 100mg">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Açıklama (Tok/Aç vb.)</label>
+                            <input type="text" class="form-input" id="medDesc" placeholder="Örn: Tok Karna">
+                        </div>
+                        <div class="form-group">
+                            <div class="d-flex-between mb-1">
+                                <label class="form-label mb-0">Kullanım Saatleri</label>
+                                <button type="button" id="addTimeBtn" class="btn-text-emerald">+ Saat Ekle</button>
+                            </div>
+                            <div id="timesListContainer" class="times-list-container">
+                                <!-- Time inputs will be added here -->
+                                <div class="time-input-group">
+                                    <input type="time" class="form-input med-time-input" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Kutu Adeti (Tam Kutu)</label>
+                                <input type="number" class="form-input" id="medQuantity" value="20" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Kalan Adet (Mevcut)</label>
+                                <input type="number" class="form-input" id="medCurrentQuantity" value="20" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Renk</label>
+                            <div class="color-picker">
+                                <button type="button" class="color-option bg-green selected" data-color="green"></button>
+                                <button type="button" class="color-option bg-red" data-color="red"></button>
+                                <button type="button" class="color-option bg-yellow" data-color="yellow"></button>
+                                <button type="button" class="color-option bg-blue" data-color="blue"></button>
+                            </div>
+                            <input type="hidden" id="medColor" value="green">
+                        </div>
+                        <button type="submit" class="btn-primary w-100">Cihaza Kaydet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PWA & App Logic -->
+    <input type="file" id="importFile" accept=".json" onchange="handleImport(event)" style="display:none;">
+    <script src="app.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').then((registration) => {
+                    console.log('ServiceWorker registration successful');
+                }).catch((err) => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>
