@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meditrack-pwa-v2';
+const CACHE_NAME = 'meditrack-pwa-v9';
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -10,6 +10,7 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+    self.skipWaiting(); // Eski cache'i acımasızca atlar
     event.waitUntil(
         caches.open(CACHE_NAME)
         .then((cache) => {
@@ -49,6 +50,6 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim()) // Anında devreye gir
     );
 });
